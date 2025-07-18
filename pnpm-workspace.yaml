@@ -1,0 +1,11 @@
+packages:
+  - 'apps/*'
+  - 'libs/*'
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - bcrypt
+  - nx

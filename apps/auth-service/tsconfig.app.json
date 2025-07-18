@@ -1,0 +1,25 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"outDir": "../../dist/out-tsc",
+		"module": "commonjs",
+		"types": ["node"],
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+		"target": "es2022",
+		"baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app/*"],
+      "@config/*": ["src/config/*"],
+      "@shared/*": ["src/shared/*"]
+    }
+	},
+	"files": ["src/main.ts"],
+	"include": ["src/**/*.ts"],
+	"exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+}
