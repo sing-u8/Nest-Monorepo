@@ -69,7 +69,6 @@
     "supertest": "^7.0.0",
     "ts-loader": "^9.5.2",
     "tsconfig-paths": "^4.2.0",
-    "@biomejs/biome": "^2.1.2",
     "@types/bcrypt": "^5.0.2",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/pg": "^8.15.4"
