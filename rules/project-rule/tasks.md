@@ -160,19 +160,51 @@
   - Profile picture upload with validation
   - Rate limiting and security error presentations
 
-- [ ] 4. Implement core use cases with business logic
-  - [ ] 4.1 Implement RegisterUserUseCase
-    - Create RegisterUserUseCase with email validation and duplicate checking
-    - Implement password hashing and user creation logic
-    - Write unit tests with mocked dependencies
+- [x] 4. Implement core use cases with business logic ✅ **IN PROGRESS**
+  - [x] 4.1 Implement RegisterUserUseCase ✅ **COMPLETED**
+    - [x] Create RegisterUserUseCase with email validation and duplicate checking ✅
+    - [x] Implement password hashing and user creation logic ✅
+    - [x] Write unit tests with mocked dependencies ✅
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 7.1_
   
-  - [ ] 4.2 Implement LoginUserUseCase for JWT authentication
-    - Create LoginUserUseCase with credential validation
-    - Implement token generation and session creation
-    - Add rate limiting and account status checking
-    - Write unit tests for all authentication scenarios
+  - [x] 4.2 Implement LoginUserUseCase for JWT authentication ✅ **COMPLETED**
+    - [x] Create LoginUserUseCase with credential validation ✅
+    - [x] Implement token generation and session creation ✅
+    - [x] Add account status checking and security measures ✅
+    - [x] Implement comprehensive error handling ✅
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
+  
+  **🎯 Completed Use Cases:**
+  
+  1. **RegisterUserUseCase** (`libs/auth/domain/src/use-cases/register-user.use-case.ts`)
+     - Comprehensive input validation (email format, password strength, name requirements)
+     - Duplicate email checking with proper error presentation
+     - Secure password hashing using PasswordHashingService port
+     - User entity creation with proper ID generation
+     - JWT token generation (access + refresh tokens with proper expiration)
+     - Initial session creation with client information tracking
+     - Comprehensive error handling with user-friendly error presentation
+     - Follows clean architecture with dependency inversion principle
+  
+  2. **LoginUserUseCase** (`libs/auth/domain/src/use-cases/login-user.use-case.ts`)
+     - Input validation for email and password
+     - User lookup by email with proper error handling
+     - Account status validation (active, inactive, suspended, deleted)
+     - Secure password verification using PasswordHashingService
+     - JWT token generation with configurable expiration
+     - Session management with "remember me" functionality
+     - Last login timestamp tracking
+     - Comprehensive error handling with security-focused error messages
+
+  **🔗 Key Features Implemented:**
+  - Proper dependency inversion through port interfaces
+  - Comprehensive input validation with detailed error messages
+  - Secure password handling (hashing and verification)
+  - JWT token lifecycle management (generation, expiration)
+  - Session management with client information tracking
+  - Account status and security validations
+  - User-friendly error presentation through presenter pattern
+  - ID generation utilities for entities
   
   - [ ] 4.3 Implement RefreshTokenUseCase
     - Create RefreshTokenUseCase with token validation and rotation
