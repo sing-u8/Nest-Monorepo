@@ -1,0 +1,1 @@
+export { DatabaseSeeder } from './seed-data';
