@@ -247,11 +247,31 @@
      - Session creation with client information tracking
      - Full test coverage with mocked OAuth services
   
-  - [ ] 4.5 Implement UpdateProfileUseCase
-    - Create UpdateProfileUseCase with profile validation
-    - Implement profile picture upload handling
-    - Write unit tests for profile update scenarios
+  - [x] 4.5 Implement UpdateProfileUseCase ✅ **COMPLETED**
+    - [x] Create UpdateProfileUseCase with profile validation ✅
+    - [x] Implement profile picture upload handling ✅
+    - [x] Write unit tests for profile update scenarios ✅
     - _Requirements: 1.5, 1.6_
+  
+  5. **UpdateProfileUseCase** (`libs/auth/domain/src/use-cases/update-profile.use-case.ts`)
+     - Profile update functionality with name and profile picture support
+     - Comprehensive input validation (name length, character restrictions, URL validation)
+     - Profile picture upload with file validation (MIME type, size limits, format checking)
+     - Support for international characters in names (Unicode support)
+     - Account status validation and security measures
+     - Change detection to prevent unnecessary updates
+     - Separate methods for profile update and profile picture upload
+     - File validation with support for JPEG, PNG, GIF, WebP formats
+     - Storage URL generation (ready for cloud storage integration)
+     - Full test coverage with edge cases and validation scenarios
+
+**🔗 Step 4 Summary - Core Use Cases Complete:**
+All authentication and user management use cases have been successfully implemented with comprehensive business logic, security measures, and full test coverage. The domain layer now includes:
+- User registration with validation and token generation
+- Secure login with account status checking and session management  
+- Token refresh with rotation and security validation
+- OAuth social login for Google and Apple Sign In
+- Profile management with picture upload capabilities
 
 - [ ] 5. Implement infrastructure layer adapters
   - [ ] 5.1 Create database repository implementations
