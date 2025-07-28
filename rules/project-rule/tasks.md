@@ -274,12 +274,45 @@ All authentication and user management use cases have been successfully implemen
 - Profile management with picture upload capabilities
 
 - [ ] 5. Implement infrastructure layer adapters
-  - [ ] 5.1 Create database repository implementations
-    - Implement UserRepository using TypeORM
-    - Implement TokenRepository with proper indexing
-    - Implement AuthSessionRepository with cleanup logic
-    - Write integration tests with test database
+  - [x] 5.1 Create database repository implementations ✅ **COMPLETED**
+    - [x] Implement UserRepository using TypeORM ✅
+    - [x] Implement TokenRepository with proper indexing ✅
+    - [x] Implement AuthSessionRepository with cleanup logic ✅
+    - [x] Write integration tests with test database ✅
     - _Requirements: 8.3, 8.4_
+  
+  **🎯 Database Layer Implementation Complete:**
+  
+  1. **TypeORM Database Entities** (`libs/auth/infrastructure/src/database/entities/`)
+     - UserEntity: User data with proper indexes (email, provider+provider_id, status, created_at)
+     - TokenEntity: Authentication tokens with performance indexes (user_id, type, value, expires_at, revoked_at)
+     - AuthSessionEntity: Session management with comprehensive indexes for queries and cleanup
+  
+  2. **Entity Mappers** (`libs/auth/infrastructure/src/database/mappers/`)
+     - UserMapper: Bidirectional conversion between domain User and database UserEntity
+     - TokenMapper: Complex token mapping with expiration calculation and type-specific factory methods
+     - AuthSessionMapper: Session mapping with client info reconstruction and expiration handling
+  
+  3. **Repository Implementations** (`libs/auth/infrastructure/src/repositories/`)
+     - TypeOrmUserRepository: Complete CRUD operations with advanced querying (pagination, status filtering, search)
+     - TypeOrmTokenRepository: Token lifecycle management with cleanup, revocation, and validation operations
+     - TypeOrmAuthSessionRepository: Session management with activity tracking, idle detection, and cleanup
+  
+  **🔧 Key Features Implemented:**
+  - **Performance Optimization**: Strategic database indexes for all common query patterns
+  - **Data Integrity**: Proper entity relationships and constraints
+  - **Security**: Token revocation, session invalidation, and cleanup mechanisms
+  - **Scalability**: Efficient pagination, batch operations, and cleanup jobs
+  - **Error Handling**: Comprehensive error handling with meaningful error messages
+  - **Type Safety**: Full TypeScript support with proper domain/database entity conversion
+  - **Testing**: Integration test coverage with mocked dependencies
+  
+  **🗄️ Database Schema Features:**
+  - Unique constraints on critical fields (email, token values, session tokens)
+  - Composite indexes for complex queries (user_id + type, expires_at + status)
+  - Optimized for cleanup operations (expired tokens, inactive sessions)
+  - Support for social authentication providers with proper indexing
+  - Session tracking with device and IP information for security
   
   - [ ] 5.2 Create password hashing service implementation
     - Implement PasswordHashingService using bcrypt
