@@ -206,11 +206,28 @@
   - User-friendly error presentation through presenter pattern
   - ID generation utilities for entities
   
-  - [ ] 4.3 Implement RefreshTokenUseCase
-    - Create RefreshTokenUseCase with token validation and rotation
-    - Implement secure token refresh logic
-    - Write unit tests for token refresh scenarios
+  - [x] 4.3 Implement RefreshTokenUseCase ✅ **COMPLETED**
+    - [x] Create RefreshTokenUseCase with token validation and rotation ✅
+    - [x] Implement secure token refresh logic ✅
+    - [x] Write unit tests for token refresh scenarios ✅
     - _Requirements: 2.4, 2.6, 6.6_
+  
+  3. **RefreshTokenUseCase** (`libs/auth/domain/src/use-cases/refresh-token.use-case.ts`)
+     - Secure token refresh with token rotation (revokes old refresh token)
+     - Multi-layer validation: token format, signature, user account status
+     - Session validation with client information matching
+     - Comprehensive security measures (revoke all tokens on suspicious activity)
+     - Automatic cleanup of expired tokens (housekeeping)
+     - Protection against token replay attacks
+     - Graceful error handling with security-focused error messages
+
+  **🔒 Security Features Implemented:**
+  - Token rotation: Old refresh tokens are immediately revoked
+  - Multi-layer validation: Format → Database → Signature → User → Session
+  - Suspicious activity detection: Revoke all user tokens on validation failures
+  - Session correlation: Validate client information consistency
+  - Automatic cleanup: Remove expired tokens during refresh
+  - Error handling: Security-focused error messages without information leakage
   
   - [ ] 4.4 Implement SocialLoginUseCase for OAuth flows
     - Create SocialLoginUseCase supporting Google and Apple OAuth
