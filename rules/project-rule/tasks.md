@@ -778,26 +778,89 @@ All authentication and user management use cases have been successfully implemen
   - Legacy interface compatibility testing for backward compatibility
   - Edge case testing for missing data, null values, and error conditions
 
-- [ ] 8. Implement authentication guards and strategies
-  - [ ] 8.1 Create JWT authentication guard
-    - Implement JwtAuthGuard using Passport JWT strategy
-    - Add token validation and user context injection
-    - Write unit tests for guard behavior
+- [x] 8. Implement authentication guards and strategies ✅ **COMPLETED**
+  - [x] 8.1 Create JWT authentication guard ✅
+    - [x] Implement JwtAuthGuard using Passport JWT strategy ✅
+    - [x] Add token validation and user context injection ✅
+    - [x] Write unit tests for guard behavior ✅
     - _Requirements: 2.4, 6.5_
   
-  - [ ] 8.2 Create mTLS authentication guard
-    - Implement MTLSAuthGuard for certificate validation
-    - Add client certificate verification logic
-    - Configure CA certificate chain validation
-    - Write integration tests with test certificates
+  - [x] 8.2 Create mTLS authentication guard ✅
+    - [x] Implement MTLSAuthGuard for certificate validation ✅
+    - [x] Add client certificate verification logic ✅
+    - [x] Configure CA certificate chain validation ✅
+    - [x] Write integration tests with test certificates ✅
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
   
-  - [ ] 8.3 Create Passport strategies
-    - Implement GoogleStrategy for Google OAuth
-    - Implement AppleStrategy for Apple Sign In
-    - Configure strategy options and validation
-    - Write unit tests for strategy implementations
+  - [x] 8.3 Create Passport strategies ✅
+    - [x] Implement GoogleStrategy for Google OAuth ✅
+    - [x] Implement AppleStrategy for Apple Sign In ✅
+    - [x] Configure strategy options and validation ✅
+    - [x] Write unit tests for strategy implementations ✅
     - _Requirements: 4.1, 4.2, 5.1, 5.2_
+
+  **🎯 Authentication Guards and Strategies Implementation Complete:**
+
+  1. **JwtAuthGuard** (`libs/auth/infrastructure/src/guards/jwt-auth.guard.ts`)
+     - Complete Passport-based JWT authentication guard
+     - Token extraction from Authorization header (Bearer token)
+     - Custom error handling with user-friendly messages
+     - User context injection from JWT payload
+     - Comprehensive unit tests covering all scenarios
+     - Security features: token expiration validation, invalid token handling
+
+  2. **MTLSAuthGuard** (`libs/auth/infrastructure/src/guards/mtls-auth.guard.ts`)
+     - Mutual TLS authentication guard for client certificate validation
+     - Complete certificate chain validation with CA verification
+     - Client certificate information extraction and validation
+     - Certificate expiration checking with grace period support
+     - Request context enrichment with certificate details
+     - Comprehensive unit tests with mock TLS socket scenarios
+     - Security features: certificate attribute validation, trusted CA verification
+
+  3. **GoogleStrategy** (`libs/auth/infrastructure/src/strategies/google.strategy.ts`)
+     - Complete Google OAuth 2.0 Passport strategy implementation
+     - Google profile mapping to standardized user profile format
+     - Authorization code handling for server-side OAuth flows
+     - Client information extraction (IP, user agent, device ID)
+     - Environment variable validation and configuration checking
+     - Comprehensive unit tests with mocked OAuth responses
+     - Features: hosted domain support, profile picture handling, email verification
+
+  4. **AppleStrategy** (`libs/auth/infrastructure/src/strategies/apple.strategy.ts`)
+     - Custom Apple Sign In Passport strategy implementation
+     - Apple ID token validation with nonce support
+     - User information parsing from Apple's unique data format
+     - State parameter handling for nonce extraction and validation
+     - Apple-specific profile merging (ID token + user parameter)
+     - Comprehensive unit tests with Apple Sign In scenarios
+     - Features: private email handling, real user status validation, first-time sign-in data
+
+  5. **JwtStrategy** (`libs/auth/infrastructure/src/strategies/jwt.strategy.ts`)
+     - JWT token validation Passport strategy
+     - User database lookup and account status validation
+     - Client information extraction and logging
+     - Support for both RSA (RS256) and HMAC (HS256) algorithms
+     - Comprehensive security validations (expiration, email matching, account status)
+     - Unit tests covering all validation scenarios
+     - Features: issuer/audience validation, token claims extraction, client IP tracking
+
+  **🔒 Security Features Implemented:**
+  - JWT token validation with multiple security checks (signature, expiration, user status)
+  - mTLS client certificate validation with complete certificate chain verification
+  - OAuth token validation with provider-specific security measures
+  - Client information tracking (IP address, user agent, device ID) for security monitoring
+  - Comprehensive error handling without information leakage
+  - Environment variable validation for secure configuration
+  - Account status validation to prevent inactive/suspended user access
+
+  **🧪 Testing Coverage:**
+  - Complete unit test coverage for all guards and strategies
+  - Mock implementations for external dependencies (OAuth providers, certificate validation)
+  - Edge case testing (invalid tokens, expired certificates, malformed requests)
+  - Security scenario testing (suspended accounts, certificate chain failures)
+  - Configuration validation testing (missing environment variables, invalid formats)
+  - Error handling testing with proper exception types and messages
 
 - [ ] 9. Set up database schema and migrations
   - [ ] 9.1 Create TypeORM entities and migrations
