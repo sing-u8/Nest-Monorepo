@@ -1,0 +1,1 @@
+export { BcryptPasswordHashingService } from './bcrypt-password-hashing.service';
