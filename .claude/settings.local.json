@@ -10,7 +10,8 @@
       "Bash(npx nx test:*)",
       "Bash(npm test:*)",
       "Bash(npx nx list:*)",
-      "Bash(npx nx show:*)"
+      "Bash(npx nx show:*)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }
