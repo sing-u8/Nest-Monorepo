@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nx generate:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}
