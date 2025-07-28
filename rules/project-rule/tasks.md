@@ -111,25 +111,54 @@
   - Mock timers for time-based testing
   - 100% business logic coverage
 
-- [ ] 3. Define use case interfaces and ports
-  - [ ] 3.1 Create repository port interfaces
-    - Define UserRepository interface with CRUD operations
-    - Define TokenRepository interface with token management operations
-    - Define AuthSessionRepository interface with session operations
+- [x] 3. Define use case interfaces and ports ✅ **COMPLETED**
+  - [x] 3.1 Create repository port interfaces ✅
+    - [x] Define UserRepository interface with CRUD operations ✅
+    - [x] Define TokenRepository interface with token management operations ✅
+    - [x] Define AuthSessionRepository interface with session operations ✅
     - _Requirements: 8.3, 8.4_
   
-  - [ ] 3.2 Create external service port interfaces
-    - Define GoogleOAuthService interface for Google authentication
-    - Define AppleOAuthService interface for Apple authentication
-    - Define PasswordHashingService interface for password operations
-    - Define TokenService interface for JWT operations
+  - [x] 3.2 Create external service port interfaces ✅
+    - [x] Define GoogleOAuthService interface for Google authentication ✅
+    - [x] Define AppleOAuthService interface for Apple authentication ✅
+    - [x] Define PasswordHashingService interface for password operations ✅
+    - [x] Define TokenService interface for JWT operations ✅
     - _Requirements: 4.1, 4.2, 5.1, 5.2, 7.1_
   
-  - [ ] 3.3 Define use case input/output models
-    - Create request/response DTOs for all authentication use cases
-    - Define output port interfaces for presenters
-    - Implement proper validation for input models
+  - [x] 3.3 Define use case input/output models ✅
+    - [x] Create request/response DTOs for all authentication use cases ✅
+    - [x] Define output port interfaces for presenters ✅
+    - [x] Implement proper validation for input models ✅
     - _Requirements: 8.4, 8.5_
+  
+  **🎯 Created Interfaces and Ports:**
+  
+  1. **Repository Ports** (`libs/auth/domain/src/ports/repositories/`)
+     - UserRepository: CRUD operations with find by email/provider support
+     - TokenRepository: Token storage with expiration cleanup and batch operations
+     - AuthSessionRepository: Session management with activity tracking
+  
+  2. **Service Ports** (`libs/auth/domain/src/ports/services/`)
+     - PasswordHashingService: Secure password hashing with configurable algorithms
+     - TokenService: JWT token generation, validation, and management
+     - GoogleOAuthService: Complete Google OAuth 2.0 flow implementation
+     - AppleOAuthService: Apple Sign In with identity token validation
+  
+  3. **DTOs** (`libs/auth/shared/src/dtos/`)
+     - Comprehensive auth.dto.ts: Registration, login, social auth, token refresh, logout
+     - Complete user.dto.ts: Profile management, sessions, account operations
+  
+  4. **Presenter Ports** (`libs/auth/domain/src/ports/presenters/`)
+     - AuthPresenter: Authentication flow presentations with error handling
+     - ProfilePresenter: User profile operations with comprehensive error scenarios
+  
+  **🔗 Key Features:**
+  - Dependency inversion principle adherence
+  - Comprehensive error handling scenarios
+  - Support for all authentication flows (local, Google, Apple, mTLS)
+  - Session management with device tracking
+  - Profile picture upload with validation
+  - Rate limiting and security error presentations
 
 - [ ] 4. Implement core use cases with business logic
   - [ ] 4.1 Implement RegisterUserUseCase
