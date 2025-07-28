@@ -1,0 +1,19 @@
+{
+  "name": "domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/auth/domain/src",
+  "projectType": "library",
+  "tags": ["scope:auth", "type:domain"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/auth/domain",
+        "main": "libs/auth/domain/src/index.ts",
+        "tsConfig": "libs/auth/domain/tsconfig.lib.json",
+        "assets": ["libs/auth/domain/*.md"]
+      }
+    }
+  }
+}

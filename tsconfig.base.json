@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@auth/domain": ["libs/auth/domain/src/index.ts"],
+      "@auth/infrastructure": ["libs/auth/infrastructure/src/index.ts"],
+      "@auth/shared": ["libs/auth/shared/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

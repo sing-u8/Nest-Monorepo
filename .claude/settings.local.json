@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(nx generate:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx nx graph:*)",
+      "Bash(npx nx build:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
