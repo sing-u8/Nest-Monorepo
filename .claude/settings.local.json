@@ -6,7 +6,8 @@
       "Bash(mkdir:*)",
       "Bash(npx nx graph:*)",
       "Bash(npx nx build:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx nx test:*)"
     ],
     "deny": []
   }

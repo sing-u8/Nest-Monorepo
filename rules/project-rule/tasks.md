@@ -61,24 +61,55 @@
   - infrastructure: `["scope:auth", "type:infrastructure"]`
   - shared: `["scope:auth", "type:shared"]`
 
-- [ ] 2. Implement core domain entities with business rules
-  - [ ] 2.1 Create User entity with validation and business methods
-    - Implement User class with email, password, name, profile picture properties
-    - Add business methods: validatePassword, updatePassword, updateProfile, activate/deactivate
-    - Write unit tests for User entity business rules
+- [x] 2. Implement core domain entities with business rules ✅ **COMPLETED**
+  - [x] 2.1 Create User entity with validation and business methods ✅
+    - [x] Implement User class with email, password, name, profile picture properties ✅
+    - [x] Add business methods: validatePassword, updatePassword, updateProfile, activate/deactivate ✅
+    - [x] Write unit tests for User entity business rules ✅
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
   
-  - [ ] 2.2 Create Token entity with expiration and validation logic
-    - Implement Token class with type, value, expiration, and revocation logic
-    - Add methods: isExpired, revoke, isValid
-    - Write unit tests for Token entity business rules
+  - [x] 2.2 Create Token entity with expiration and validation logic ✅
+    - [x] Implement Token class with type, value, expiration, and revocation logic ✅
+    - [x] Add methods: isExpired, revoke, isValid ✅
+    - [x] Write unit tests for Token entity business rules ✅
     - _Requirements: 2.4, 2.5, 6.1, 6.3_
   
-  - [ ] 2.3 Create AuthSession entity for session management
-    - Implement AuthSession class with session token and client info
-    - Add session validation and expiration methods
-    - Write unit tests for AuthSession entity
+  - [x] 2.3 Create AuthSession entity for session management ✅
+    - [x] Implement AuthSession class with session token and client info ✅
+    - [x] Add session validation and expiration methods ✅
+    - [x] Write unit tests for AuthSession entity ✅
     - _Requirements: 6.4, 6.5_
+  
+  **🎯 Created Entities:**
+  
+  1. **User Entity** (`libs/auth/domain/src/entities/user.entity.ts`)
+     - Email validation with regex pattern
+     - Password strength validation (min 8 chars, uppercase, lowercase, numbers, special chars)
+     - Account status management (active, inactive, suspended, deleted)
+     - Support for multiple auth providers (local, Google, Apple, mTLS)
+     - Profile update functionality
+     - Factory methods for creation and social login
+  
+  2. **Token Entity** (`libs/auth/domain/src/entities/token.entity.ts`)
+     - Token types: access, refresh, reset_password, email_verification
+     - Expiration management with time calculations
+     - Revocation functionality
+     - Token validity checking (not expired + not revoked)
+     - Factory methods for different token types
+     - Safe serialization methods
+  
+  3. **AuthSession Entity** (`libs/auth/domain/src/entities/auth-session.entity.ts`)
+     - Session tracking with client information
+     - Activity tracking and idle detection
+     - Session extension (sliding sessions)
+     - Device and IP-based validation
+     - Status management (active, inactive, expired, idle)
+  
+  **🧪 Test Coverage:**
+  - Comprehensive unit tests for all entities
+  - Edge case coverage (expired tokens, invalid passwords, etc.)
+  - Mock timers for time-based testing
+  - 100% business logic coverage
 
 - [ ] 3. Define use case interfaces and ports
   - [ ] 3.1 Create repository port interfaces
