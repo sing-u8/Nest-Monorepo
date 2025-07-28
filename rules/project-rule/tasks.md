@@ -862,7 +862,7 @@ All authentication and user management use cases have been successfully implemen
   - Configuration validation testing (missing environment variables, invalid formats)
   - Error handling testing with proper exception types and messages
 
-- [ ] 9. Set up database schema and migrations
+- [x] 9. Set up database schema and migrations
   - [x] 9.1 Create TypeORM entities and migrations ✅
     - [x] Create database entities for User, Token, AuthSession ✅
     - [x] Generate and configure database migrations ✅
@@ -929,11 +929,75 @@ All authentication and user management use cases have been successfully implemen
   - Relationship and cascade behavior validation
   - Query optimization testing with large datasets
   
-  - [ ] 9.2 Configure database connection and pooling
-    - Set up TypeORM configuration with connection pooling
-    - Configure database connection for different environments
-    - Add database health check endpoint
+  - [x] 9.2 Configure database connection and pooling ✅ **COMPLETED**
+    - [x] Set up TypeORM configuration with connection pooling ✅
+    - [x] Configure database connection for different environments ✅
+    - [x] Add database health check endpoint ✅
+    - [x] Create database module for NestJS ✅
+    - [x] Add database connection monitoring ✅
     - _Requirements: 8.1_
+
+  **🎯 Database Connection and Pooling Implementation Complete:**
+
+  1. **DatabaseModule** (`libs/auth/infrastructure/src/database/database.module.ts`)
+     - Complete TypeORM async configuration with environment variables
+     - Connection pooling settings (max: 20, min: 5, acquire: 30s, idle: 10s, evict: 60s)
+     - SSL configuration with certificate support
+     - Enhanced logging configuration (development vs production)
+     - Migration configuration with transaction mode
+     - Performance optimizations (slow query threshold: 1s)
+     - Redis cache configuration option
+     - Global module with proper dependency injection
+
+  2. **DatabaseHealthService** (`libs/auth/infrastructure/src/database/health/database-health.service.ts`)
+     - Comprehensive database health monitoring
+     - Connection status validation with response time measurement
+     - Connection pool usage tracking and statistics
+     - Database performance metrics (query times, cache hit ratio)
+     - Health status calculation (healthy/degraded/unhealthy)
+     - PostgreSQL-specific metrics (version, uptime, connection stats)
+     - Automatic health monitoring on module initialization
+     - Production retry logic with exponential backoff
+
+  3. **DatabaseHealthController** (`libs/auth/infrastructure/src/database/health/database-health.controller.ts`)
+     - REST API endpoints for database monitoring
+     - GET /health/database - Complete health check with metrics
+     - GET /health/database/pool - Connection pool status
+     - GET /health/database/performance - Performance metrics
+     - OpenAPI documentation for all endpoints
+
+  4. **Database Integration Tests** (`libs/auth/infrastructure/src/database/tests/`)
+     - Complete integration tests with real database connections
+     - Connection pooling validation and performance testing
+     - Health service testing with mocked scenarios
+     - Entity operations testing with constraint validation
+     - Error scenario testing (connection failures, query timeouts)
+
+  **🔧 Key Features Implemented:**
+  - **Connection Pooling**: Optimized pool settings with environment-specific configuration
+  - **Health Monitoring**: Real-time health checks with performance metrics
+  - **Environment Support**: Development, test, and production configurations
+  - **SSL Support**: Complete SSL configuration with certificate options
+  - **Performance Tracking**: Query performance monitoring and slow query detection
+  - **Cache Integration**: Redis cache support for query optimization
+  - **Auto-Monitoring**: Automatic health checks on application startup
+  - **Retry Logic**: Production-grade retry mechanism for connection failures
+
+  **🛡️ Security and Reliability Features:**
+  - Connection timeout and retry configurations
+  - SSL certificate validation
+  - Statement and query timeout protection
+  - Connection pool monitoring to prevent exhaustion
+  - Comprehensive error handling without information leakage
+  - Production-safe configuration validation
+
+  **⚡ Performance Optimizations:**
+  - Configurable connection pool sizes based on environment
+  - Query timeout settings to prevent hanging connections
+  - Slow query monitoring for performance optimization
+  - Connection eviction policies for resource management
+  - Cache configuration for improved query performance
+  - Performance metrics collection for monitoring
 
 - [ ] 10. Implement security features
   - [ ] 10.1 Add rate limiting middleware
