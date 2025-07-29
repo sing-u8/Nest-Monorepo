@@ -175,6 +175,114 @@ export class HealthController {
   }
 
   /**
+   * External services health check
+   * Checks connectivity to external dependencies
+   */
+  @Get('external')
+  @ApiOperation({ 
+    summary: 'External services health check',
+    description: 'Check connectivity and availability of external service dependencies'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'External services health information',
+  })
+  @HealthCheck()
+  checkExternalServices() {
+    return this.health.check([
+      () => this.healthService.checkExternalServiceDependencies(),
+      () => this.healthService.checkRedisConnectivity(),
+    ]);
+  }
+
+  /**
+   * Security configuration health check
+   * Validates security settings and configuration
+   */
+  @Get('security')
+  @ApiOperation({ 
+    summary: 'Security configuration health check',
+    description: 'Validate security configuration and settings'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Security configuration is healthy',
+  })
+  @ApiResponse({ 
+    status: 503, 
+    description: 'Security configuration has issues',
+  })
+  @HealthCheck()
+  checkSecurity() {
+    return this.health.check([
+      () => this.healthService.checkSecurityConfiguration(),
+      () => this.healthService.checkJWTConfiguration(),
+    ]);
+  }
+
+  /**
+   * Comprehensive health check
+   * Runs all available health checks for complete system status
+   */
+  @Get('comprehensive')
+  @ApiOperation({ 
+    summary: 'Comprehensive health check',
+    description: 'Complete system health check including all components and dependencies'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Complete system health information',
+  })
+  @HealthCheck()
+  checkComprehensive() {
+    return this.health.check([
+      // Core system checks
+      () => this.db.pingCheck('database'),
+      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
+      () => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),
+      () => this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.9 }),
+      
+      // Application-specific checks
+      () => this.healthService.checkApplicationUptime(),
+      () => this.healthService.checkJWTConfiguration(),
+      () => this.healthService.checkOAuthConfiguration(),
+      () => this.healthService.checkRequiredEnvironmentVariables(),
+      () => this.healthService.checkSecurityConfiguration(),
+      
+      // External dependencies (non-critical)
+      () => this.healthService.checkExternalServiceDependencies(),
+      () => this.healthService.checkRedisConnectivity(),
+    ]);
+  }
+
+  /**
+   * Simple status endpoint
+   * Returns basic status for external monitoring tools
+   */
+  @Get('status')
+  @ApiOperation({ 
+    summary: 'Simple status check',
+    description: 'Simple status endpoint for external monitoring systems'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Application status',
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', example: 'healthy' },
+        timestamp: { type: 'string', example: '2023-12-01T10:00:00Z' },
+        uptime: { type: 'number', example: 12345 },
+        memory: { type: 'object' },
+        system: { type: 'object' },
+      }
+    }
+  })
+  getStatus() {
+    return this.healthService.getHealthStatus();
+  }
+
+  /**
    * Application info endpoint
    * Returns static information about the application
    */
