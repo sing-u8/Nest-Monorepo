@@ -220,23 +220,55 @@ export const TEST_JWT_CONFIG: JwtConfig = {
  * @param environment - Current environment (development, production, test)
  * @returns Appropriate configuration for the environment
  */
-export function getJwtConfig(environment: string = 'development'): JwtConfig {
-  switch (environment.toLowerCase()) {
-    case 'production':
-    case 'prod':
-      return PRODUCTION_JWT_CONFIG;
-    
-    case 'development':
-    case 'dev':
-      return DEVELOPMENT_JWT_CONFIG;
-    
-    case 'test':
-    case 'testing':
-      return TEST_JWT_CONFIG;
-    
-    default:
-      return DEFAULT_JWT_CONFIG;
-  }
+export function getJwtConfig(environment: string = process.env.NODE_ENV || 'development'): JwtConfig {
+  const baseConfig = (() => {
+    switch (environment.toLowerCase()) {
+      case 'production':
+      case 'prod':
+        return PRODUCTION_JWT_CONFIG;
+      
+      case 'development':
+      case 'dev':
+        return DEVELOPMENT_JWT_CONFIG;
+      
+      case 'test':
+      case 'testing':
+        return TEST_JWT_CONFIG;
+      
+      default:
+        return DEFAULT_JWT_CONFIG;
+    }
+  })();
+
+  // Override with environment variables if provided
+  const envConfig: Partial<JwtConfig> = {
+    algorithm: baseConfig.algorithm,
+    issuer: process.env.JWT_ISSUER || baseConfig.issuer,
+    audience: process.env.JWT_AUDIENCE || baseConfig.audience,
+    secretKey: process.env.JWT_SECRET || baseConfig.secretKey,
+    defaultExpirations: {
+      accessToken: process.env.JWT_ACCESS_TOKEN_EXPIRATION || baseConfig.defaultExpirations.accessToken,
+      refreshToken: process.env.JWT_REFRESH_TOKEN_EXPIRATION || baseConfig.defaultExpirations.refreshToken,
+      resetPasswordToken: baseConfig.defaultExpirations.resetPasswordToken,
+      emailVerificationToken: baseConfig.defaultExpirations.emailVerificationToken,
+    },
+  };
+
+  const finalConfig = { ...baseConfig, ...envConfig };
+  
+  // Add computed properties for NestJS JWT module compatibility
+  return {
+    ...finalConfig,
+    secret: finalConfig.secretKey,
+    accessTokenExpiration: finalConfig.defaultExpirations.accessToken,
+    refreshTokenExpiration: finalConfig.defaultExpirations.refreshToken,
+    clockTolerance: finalConfig.security.clockTolerance,
+  } as JwtConfig & {
+    secret: string;
+    accessTokenExpiration: string;
+    refreshTokenExpiration: string;
+    clockTolerance: number;
+  };
 }
 
 /**

@@ -234,23 +234,45 @@ TEST_PRIVATE_KEY_CONTENT
  * @param environment - Current environment (development, production, test)
  * @returns Appropriate configuration for the environment
  */
-export function getOAuthConfig(environment: string = 'development'): OAuthConfig {
-  switch (environment.toLowerCase()) {
-    case 'production':
-    case 'prod':
-      return PRODUCTION_OAUTH_CONFIG;
-    
-    case 'development':
-    case 'dev':
-      return DEVELOPMENT_OAUTH_CONFIG;
-    
-    case 'test':
-    case 'testing':
-      return TEST_OAUTH_CONFIG;
-    
-    default:
-      return DEFAULT_OAUTH_CONFIG;
-  }
+export function getOAuthConfig(environment: string = process.env.NODE_ENV || 'development'): OAuthConfig {
+  const baseConfig = (() => {
+    switch (environment.toLowerCase()) {
+      case 'production':
+      case 'prod':
+        return PRODUCTION_OAUTH_CONFIG;
+      
+      case 'development':
+      case 'dev':
+        return DEVELOPMENT_OAUTH_CONFIG;
+      
+      case 'test':
+      case 'testing':
+        return TEST_OAUTH_CONFIG;
+      
+      default:
+        return DEFAULT_OAUTH_CONFIG;
+    }
+  })();
+
+  // Override with environment variables if provided
+  const envConfig: OAuthConfig = {
+    google: {
+      ...baseConfig.google,
+      clientId: process.env.GOOGLE_CLIENT_ID || baseConfig.google.clientId,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || baseConfig.google.clientSecret,
+      redirectUri: process.env.GOOGLE_CALLBACK_URL || baseConfig.google.redirectUri,
+    },
+    apple: {
+      ...baseConfig.apple,
+      clientId: process.env.APPLE_CLIENT_ID || baseConfig.apple.clientId,
+      teamId: process.env.APPLE_TEAM_ID || baseConfig.apple.teamId,
+      keyId: process.env.APPLE_KEY_ID || baseConfig.apple.keyId,
+      privateKey: process.env.APPLE_PRIVATE_KEY || baseConfig.apple.privateKey,
+      redirectUri: process.env.APPLE_CALLBACK_URL || baseConfig.apple.redirectUri,
+    },
+  };
+
+  return envConfig;
 }
 
 /**
