@@ -1162,7 +1162,7 @@ All authentication and user management use cases have been successfully implemen
   - CORS and CSP configuration
   - Production-ready security configurations
 
-- [ ] 11. Configure application composition and dependency injection
+- [] 11. Configure application composition and dependency injection
   - [x] 11.1 Set up NestJS modules and dependency injection ✅
     - [x] Create AuthModule with proper provider configuration ✅
     - [x] Configure dependency injection for all use cases and services ✅
@@ -1300,12 +1300,107 @@ All authentication and user management use cases have been successfully implemen
   - Complete documentation with setup and troubleshooting guides
   - Git security with proper environment file handling
   
-  - [ ] 11.3 Create application bootstrap and main entry point
-    - Configure main.ts with proper application setup
-    - Add global middleware, filters, and pipes
-    - Configure Swagger documentation
-    - Set up application shutdown hooks
+  - [x] 11.3 Create application bootstrap and main entry point ✅
+    - [x] Configure main.ts with proper application setup ✅
+    - [x] Add global middleware, filters, and pipes ✅
+    - [x] Configure Swagger documentation ✅
+    - [x] Set up application shutdown hooks ✅
+    - [x] Create health check module and endpoints ✅
+    - [x] Set up global exception filter ✅
+    - [x] Set up logging interceptor ✅
+    - [x] Update AppModule with AuthModule integration ✅
     - _Requirements: 8.1, 8.2_
+  
+  **🎯 Application Bootstrap and Main Entry Point Implementation Complete:**
+  
+  1. **Production-Ready Bootstrap** (`auth-service/src/main.ts`)
+     - Comprehensive NestJS application bootstrap with environment-aware configuration
+     - Global validation pipe with custom error formatting and type transformation
+     - API versioning support with URI-based versioning (v1, v2, etc.)
+     - Global prefix configuration with health check exclusions
+     - Compression middleware for performance optimization
+     - Graceful shutdown handling with timeout protection
+  
+  2. **Security Configuration**
+     - Helmet integration with environment-specific CSP policies
+     - CORS configuration with origin validation and credentials support
+     - Security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
+     - Environment-aware security settings (development vs production)
+     - Content Security Policy with proper directive configuration
+  
+  3. **API Documentation**
+     - Comprehensive Swagger/OpenAPI 3.0 documentation setup
+     - JWT Bearer authentication support with proper schema definitions
+     - API Key authentication for service-to-service communication
+     - Environment-specific server configurations (local, staging, production)
+     - Organized API tags for authentication, profile, OAuth, and health endpoints
+     - Custom Swagger UI styling and configuration
+  
+  4. **Health Check System** (`auth-service/src/app/health/`)
+     - **HealthModule**: Comprehensive health monitoring with Terminus integration
+     - **HealthController**: Multiple health check endpoints for different monitoring needs
+       - `/health` - Basic health check for load balancers
+       - `/health/detailed` - Comprehensive health information
+       - `/health/ready` - Kubernetes readiness probe
+       - `/health/live` - Kubernetes liveness probe
+       - `/health/info` - Application information and metadata
+     - **HealthService**: Custom health indicators for application-specific checks
+       - JWT configuration validation
+       - OAuth configuration validation
+       - Environment variables validation
+       - Application uptime monitoring
+  
+  5. **Global Error Handling**
+     - **GlobalExceptionFilter**: Centralized exception handling with structured error responses
+     - Error ID generation for tracking and debugging
+     - Environment-aware error details (development vs production)
+     - Proper HTTP status code mapping and error categorization
+     - Structured logging with request context and user information
+     - Consistent error response format across all endpoints
+  
+  6. **Request/Response Logging**
+     - **LoggingInterceptor**: Comprehensive request/response logging with performance metrics
+     - Request ID generation and tracking throughout the request lifecycle
+     - Performance monitoring with slow request detection (>1000ms)
+     - User context extraction and privacy-conscious logging
+     - Structured logging format for log aggregation systems
+     - Environment-aware logging (disabled in test, detailed in development)
+  
+  7. **Application Module Integration**
+     - **AppModule**: Root module with proper dependency injection configuration
+     - AuthModule integration with global configuration
+     - HealthModule integration for monitoring capabilities
+     - ConfigModule setup with environment file loading priority
+     - Global module exports for cross-module dependencies
+  
+  8. **Application Services**
+     - **AppController**: Root API endpoints with Swagger documentation
+     - **AppService**: Application information and status services
+     - Environment-aware feature exposure (documentation only in non-production)
+     - System metrics and memory usage reporting
+     - Comprehensive API information with endpoint discovery
+  
+  9. **Graceful Shutdown**
+     - Signal handling for SIGTERM and SIGINT with proper cleanup
+     - Uncaught exception and unhandled rejection handling
+     - Timeout-protected shutdown process (10-second limit)
+     - Proper resource cleanup and connection closing
+     - Application state logging during shutdown process
+  
+  10. **Development Experience**
+      - Environment-aware logging levels and detail
+      - Development-specific CORS and security settings
+      - Swagger documentation available only in non-production environments
+      - Comprehensive startup logging with all available endpoints
+      - Request/response tracing for debugging and monitoring
+  
+  **🔧 Key Features Implemented:**
+  - Production-ready application bootstrap with comprehensive configuration
+  - Multi-environment support with environment-specific security and logging
+  - Complete health monitoring system with Kubernetes probe compatibility
+  - Structured logging and error handling with request tracking
+  - API documentation with authentication and versioning support
+  - Global middleware pipeline with security, compression, and validation
 
 - [ ] 12. Write comprehensive tests
   - [ ] 12.1 Complete unit test coverage
