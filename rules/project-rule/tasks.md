@@ -1163,11 +1163,67 @@ All authentication and user management use cases have been successfully implemen
   - Production-ready security configurations
 
 - [ ] 11. Configure application composition and dependency injection
-  - [ ] 11.1 Set up NestJS modules and dependency injection
-    - Create AuthModule with proper provider configuration
-    - Configure dependency injection for all use cases and services
-    - Set up module imports and exports
+  - [x] 11.1 Set up NestJS modules and dependency injection ✅
+    - [x] Create AuthModule with proper provider configuration ✅
+    - [x] Configure dependency injection for all use cases and services ✅
+    - [x] Set up module imports and exports ✅
+    - [x] Configure middleware and guards in module ✅
     - _Requirements: 8.3, 8.4_
+  
+  **🎯 NestJS Module and Dependency Injection Implementation Complete:**
+  
+  1. **AuthModule** (`libs/auth/infrastructure/src/auth.module.ts`)
+     - Comprehensive NestJS module configuration with proper dependency injection
+     - Global module configuration for application-wide authentication services
+     - Complete provider configuration for all use cases, repositories, and services
+     - Factory-based dependency injection with proper token-based providers
+     - Passport and JWT module integration with async configuration
+     - Database module integration with TypeORM configuration
+     - Middleware configuration with NestModule implementation
+  
+  2. **Dependency Injection Configuration**
+     - **Repository Providers**: UserRepository, TokenRepository, AuthSessionRepository
+     - **Service Providers**: PasswordHashingService, TokenService, Google/Apple OAuth services
+     - **Use Case Providers**: Complete factory-based configuration for all 7 use cases
+     - **Presenter Providers**: AuthPresenter, ProfilePresenter, ErrorPresenter
+     - **Security Providers**: Guards (JWT, mTLS, Rate Limit) and Passport strategies
+     - **Middleware Providers**: Rate limiting, input sanitization, security headers
+  
+  3. **Module Configuration Features**
+     - **JWT Module**: Async configuration with proper signing and verification options
+     - **Passport Module**: Default JWT strategy configuration with session management
+     - **Config Module**: Global configuration with environment variable support
+     - **Database Module**: TypeORM integration with entity management
+     - **Exports**: Comprehensive exports for external module usage
+  
+  4. **Use Case Factory Configuration**
+     - **RegisterUserUseCase**: Complete factory with 6 dependencies
+     - **LoginUserUseCase**: Authentication factory with password and token services
+     - **RefreshTokenUseCase**: Token refresh factory with session management
+     - **LogoutUserUseCase**: Session cleanup factory with token revocation
+     - **SocialLoginUseCase**: OAuth factory with Google and Apple services
+     - **UpdateProfileUseCase**: Profile management factory with validation
+     - **GetUserProfileUseCase**: Profile retrieval factory with session validation
+  
+  5. **Middleware Integration**
+     - **Security Headers**: Applied to all routes with environment-specific configuration
+     - **Input Sanitization**: Applied to all routes with injection prevention
+     - **Rate Limiting**: Applied to authentication endpoints with progressive delays
+     - **NestModule Implementation**: Proper middleware configuration with route targeting
+  
+  6. **Provider Token System**
+     - String-based tokens for clean dependency injection
+     - Factory-based providers for configuration-dependent services
+     - Class-based providers for simple service implementations
+     - Proper injection token mapping for use cases and repositories
+  
+  **🔧 Key Features Implemented:**
+  - Clean architecture compliance with proper layer separation
+  - Type-safe dependency injection with factory patterns
+  - Configuration-driven service initialization
+  - Global module setup for application-wide authentication
+  - Comprehensive provider exports for external module integration
+  - Middleware pipeline configuration with security-first approach
   
   - [ ] 11.2 Configure application settings and environment variables
     - Set up configuration management with validation
