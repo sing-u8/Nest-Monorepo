@@ -15,6 +15,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
+  AuthRateLimit,
+  RegisterRateLimit,
+  RefreshRateLimit,
+} from '../decorators/rate-limit.decorator';
+import {
   RegisterUserUseCase,
   LoginUserUseCase,
   RefreshTokenUseCase,
@@ -75,6 +80,7 @@ export class AuthController {
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @RegisterRateLimit()
   @ApiOperation({
     summary: 'Register new user',
     description: 'Creates a new user account with email and password authentication',
@@ -208,6 +214,7 @@ export class AuthController {
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @AuthRateLimit()
   @ApiOperation({
     summary: 'User login',
     description: 'Authenticates user with email and password, returns access and refresh tokens',
@@ -339,6 +346,7 @@ export class AuthController {
    */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @RefreshRateLimit()
   @ApiOperation({
     summary: 'Refresh access token',
     description: 'Exchanges a valid refresh token for a new access token',
@@ -443,6 +451,7 @@ export class AuthController {
    */
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @AuthRateLimit()
   @ApiOperation({
     summary: 'User logout',
     description: 'Invalidates user session and revokes tokens',

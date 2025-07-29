@@ -22,6 +22,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Request } from 'express';
+import { ProfileRateLimit, FileUploadRateLimit } from '../decorators/rate-limit.decorator';
 import { UpdateProfileUseCase, GetUserProfileUseCase, ProfilePresenter } from '@auth/domain';
 import { JwtAuthGuard } from '../guards';
 import {
@@ -72,6 +73,7 @@ export class ProfileController {
    * GET /profile
    */
   @Get()
+  @ProfileRateLimit()
   @ApiOperation({
     summary: 'Get user profile',
     description: 'Retrieve the authenticated user\'s profile information',
@@ -181,6 +183,7 @@ export class ProfileController {
    */
   @Put()
   @HttpCode(HttpStatus.OK)
+  @ProfileRateLimit()
   @ApiOperation({
     summary: 'Update user profile',
     description: 'Update the authenticated user\'s profile information (name, etc.)',
@@ -333,6 +336,7 @@ export class ProfileController {
    */
   @Post('picture')
   @HttpCode(HttpStatus.OK)
+  @FileUploadRateLimit()
   @UseInterceptors(FileInterceptor('file', {
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB
@@ -499,6 +503,7 @@ export class ProfileController {
    */
   @Put('picture/delete')
   @HttpCode(HttpStatus.OK)
+  @ProfileRateLimit()
   @ApiOperation({
     summary: 'Delete profile picture',
     description: 'Remove the authenticated user\'s profile picture',

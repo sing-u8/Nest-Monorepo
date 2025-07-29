@@ -18,6 +18,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import { SocialAuthRateLimit } from '../decorators/rate-limit.decorator';
 import { SocialLoginUseCase, AuthPresenter } from '@auth/domain';
 import { GoogleOAuthService, AppleOAuthService } from '../services';
 import {
@@ -64,6 +65,7 @@ export class SocialAuthController {
    * GET /auth/google
    */
   @Get('google')
+  @SocialAuthRateLimit()
   @ApiOperation({
     summary: 'Initiate Google OAuth flow',
     description: 'Redirects user to Google OAuth authorization page',
@@ -133,6 +135,7 @@ export class SocialAuthController {
    * GET /auth/google/callback
    */
   @Get('google/callback')
+  @SocialAuthRateLimit()
   @ApiOperation({
     summary: 'Handle Google OAuth callback',
     description: 'Processes Google OAuth callback and completes user authentication',
@@ -301,6 +304,7 @@ export class SocialAuthController {
    * GET /auth/apple
    */
   @Get('apple')
+  @SocialAuthRateLimit()
   @ApiOperation({
     summary: 'Initiate Apple Sign In flow',
     description: 'Redirects user to Apple Sign In authorization page',
@@ -365,6 +369,7 @@ export class SocialAuthController {
    */
   @Post('apple/callback')
   @HttpCode(HttpStatus.OK)
+  @SocialAuthRateLimit()
   @ApiOperation({
     summary: 'Handle Apple Sign In callback',
     description: 'Processes Apple Sign In callback and completes user authentication',
