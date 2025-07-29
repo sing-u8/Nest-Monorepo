@@ -13,5 +13,6 @@ export * from './presenters';
 export * from './database';
 export * from './services';
 export * from './middleware';
+export * from './interceptors';
 export * from './decorators';
 export * from './config';

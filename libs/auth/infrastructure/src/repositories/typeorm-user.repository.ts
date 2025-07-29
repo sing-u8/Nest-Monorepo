@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { User, UserRepository } from '@auth/domain';
 import { UserEntity } from '../database/entities/user.entity';
 import { UserMapper } from '../database/mappers/user.mapper';
+import { MetricsService } from '../services/metrics.service';
+import { TrackDatabaseOperation, InjectMetrics } from '../decorators/metrics.decorator';
 
 /**
  * TypeORM User Repository Implementation
@@ -15,12 +17,15 @@ import { UserMapper } from '../database/mappers/user.mapper';
 export class TypeOrmUserRepository implements UserRepository {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectMetrics()
+    private readonly metricsService: MetricsService,
   ) {}
 
   /**
    * Find a user by their unique ID
    */
+  @TrackDatabaseOperation('select', 'users')
   async findById(id: string): Promise<User | null> {
     try {
       const userEntity = await this.userRepository.findOne({
@@ -37,6 +42,7 @@ export class TypeOrmUserRepository implements UserRepository {
   /**
    * Find a user by their email address
    */
+  @TrackDatabaseOperation('select', 'users')
   async findByEmail(email: string): Promise<User | null> {
     try {
       const userEntity = await this.userRepository.findOne({

@@ -243,6 +243,19 @@ export class AppConfig {
   @IsString()
   @IsOptional()
   MONITORING_HEALTH_CHECK_PATH?: string = '/health';
+
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  MONITORING_ENABLE_ALERTING: boolean = false;
+
+  @IsString()
+  @IsOptional()
+  @IsUrl()
+  MONITORING_WEBHOOK_URL?: string;
+
+  @IsString()
+  @IsOptional()
+  MONITORING_EMAIL_TO?: string;
 }
 
 /**

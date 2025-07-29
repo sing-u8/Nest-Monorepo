@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleOAuthService as GoogleOAuthPort, GoogleUserProfile, GoogleOAuthTokens } from '@auth/domain';
 import { google, Auth } from 'googleapis';
+import { MetricsService } from './metrics.service';
+import { InjectMetrics, TrackExternalService } from '../decorators/metrics.decorator';
 
 /**
  * Google OAuth Service Implementation
@@ -15,7 +17,10 @@ export class GoogleOAuthService implements GoogleOAuthPort {
   private readonly clientSecret: string;
   private readonly redirectUri: string;
 
-  constructor() {
+  constructor(
+    @InjectMetrics()
+    private readonly metricsService: MetricsService,
+  ) {
     // Load configuration from environment variables
     this.clientId = process.env.GOOGLE_CLIENT_ID || '';
     this.clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';

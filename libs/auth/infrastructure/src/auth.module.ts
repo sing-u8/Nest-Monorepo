@@ -10,6 +10,8 @@ import { DatabaseModule } from './database/database.module';
 import { AuthController } from './controllers/auth.controller';
 import { SocialAuthController } from './controllers/social-auth.controller';
 import { ProfileController } from './controllers/profile.controller';
+import { MetricsController } from './controllers/metrics.controller';
+import { AlertingController } from './controllers/alerting.controller';
 
 // Use Cases (Domain Layer)
 import {
@@ -33,6 +35,8 @@ import { JwtTokenService } from './services/jwt-token.service';
 import { GoogleOAuthService } from './services/google-oauth.service';
 import { AppleOAuthService } from './services/apple-oauth.service';
 import { AuditLoggerService } from './services/audit-logger.service';
+import { MetricsService } from './services/metrics.service';
+import { AlertingService } from './services/alerting.service';
 
 // Presenter Implementations
 import { AuthPresenter } from './presenters/auth.presenter';
@@ -45,9 +49,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { AppleStrategy } from './strategies/apple.strategy';
 
-// Middleware
+// Middleware and Interceptors
 import { RateLimitingMiddleware } from './middleware/rate-limiting.middleware';
 import { InputSanitizationMiddleware } from './middleware/input-sanitization.middleware';
+import { MetricsInterceptor } from './interceptors/metrics.interceptor';
 import { SecurityHeadersMiddleware } from './middleware/security-headers.middleware';
 
 // Configuration
@@ -113,6 +118,8 @@ import { getRateLimitingConfig } from './config/rate-limiting.config';
     AuthController,
     SocialAuthController,
     ProfileController,
+    MetricsController,
+    AlertingController,
   ],
   
   providers: [
@@ -160,8 +167,13 @@ import { getRateLimitingConfig } from './config/rate-limiting.config';
       },
     },
     
-    // Audit Logger
+    // Monitoring Services
     AuditLoggerService,
+    MetricsService,
+    AlertingService,
+    
+    // Interceptors
+    MetricsInterceptor,
     
     // Presenter Providers (Infrastructure)
     {

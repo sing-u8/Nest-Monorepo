@@ -3,6 +3,8 @@ import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { TokenService } from '@auth/domain';
 import { TokenType, JwtPayload, TokenValidationResult } from '@auth/shared';
+import { MetricsService } from './metrics.service';
+import { InjectMetrics, MeasureTime } from '../decorators/metrics.decorator';
 
 /**
  * JWT Token Service Implementation
@@ -23,7 +25,10 @@ export class JwtTokenService implements TokenService {
   // Token blacklist - in production, use Redis or database
   private readonly tokenBlacklist = new Set<string>();
 
-  constructor() {
+  constructor(
+    @InjectMetrics()
+    private readonly metricsService: MetricsService,
+  ) {
     // Generate RSA key pair for demonstration
     // In production, use pre-generated keys from secure storage
     const { privateKey, publicKey } = this.generateRSAKeyPair();

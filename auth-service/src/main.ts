@@ -18,6 +18,7 @@ import { AppModule } from './app/app.module';
 import { AppConfig } from '@auth/infrastructure';
 import { GlobalExceptionFilter } from './app/filters/global-exception.filter';
 import { LoggingInterceptor } from './app/interceptors/logging.interceptor';
+import { MetricsInterceptor } from '@auth/infrastructure';
 import helmet from 'helmet';
 import * as compression from 'compression';
 
@@ -141,8 +142,12 @@ async function configureGlobalSettings(app: any, config: AppConfig): Promise<voi
   // Global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(ConfigService)));
 
-  // Global logging interceptor
-  app.useGlobalInterceptors(new LoggingInterceptor(app.get(ConfigService)));
+  // Global interceptors
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(app.get(ConfigService)),
+    // Enable metrics collection if configured
+    ...(config.MONITORING_ENABLE_METRICS ? [app.get(MetricsInterceptor)] : []),
+  );
 
   logger.log('Global settings configured successfully');
 }

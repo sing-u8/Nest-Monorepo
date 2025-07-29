@@ -1731,12 +1731,73 @@ All authentication and user management use cases have been successfully implemen
   - Non-blocking external service checks for high availability
   - Comprehensive error handling and structured response format
   
-  - [ ] 13.2 Add application metrics and monitoring
-    - Implement metrics collection for authentication events
-    - Add performance monitoring for critical paths
-    - Configure logging aggregation and monitoring
-    - Set up alerting for security events
+  - [x] 13.2 Add application metrics and monitoring ✅ **COMPLETED**
+    - [x] Implement metrics collection for authentication events ✅
+    - [x] Add performance monitoring for critical paths ✅
+    - [x] Configure logging aggregation and monitoring ✅
+    - [x] Set up alerting for security events ✅
     - _Requirements: 7.5_
+    
+  **🎯 Application Metrics and Monitoring Implementation Complete:**
+  
+  1. **MetricsService** (`libs/auth/infrastructure/src/services/metrics.service.ts`)
+     - **Comprehensive Metrics Collection**: 25+ metric types covering authentication, security, performance, and system metrics
+     - **Authentication Metrics**: Login/register success/failure, OAuth flows, token operations, logout tracking
+     - **Security Metrics**: Rate limiting, suspicious activity, brute force detection, invalid token attempts
+     - **Performance Metrics**: API response times, database query performance, external service calls
+     - **System Metrics**: Memory usage (heap/RSS/external), CPU usage, active connections, error rates
+     - **Data Aggregation**: Real-time metrics with percentiles (P50, P95, P99), min/max/average calculations
+     - **Export Capabilities**: JSON and Prometheus format export for monitoring system integration
+     - **Automatic Cleanup**: Configurable retention (1 hour default) with background cleanup tasks
+     - **Tagging System**: Flexible metric tagging for filtering and segmentation
+  
+  2. **MetricsInterceptor** (`libs/auth/infrastructure/src/interceptors/metrics.interceptor.ts`)
+     - **Automatic Performance Tracking**: Intercepts all HTTP requests for response time measurement
+     - **Authentication Event Detection**: Automatically detects and records auth events based on endpoints
+     - **System Resource Monitoring**: Real-time memory and CPU usage collection
+     - **Slow Request Detection**: Logs warnings for requests exceeding 1000ms
+     - **Error Categorization**: Intelligent error reason extraction and security event detection
+     - **Brute Force Detection**: Monitors failed login attempts for security threat identification
+     - **Client Information Tracking**: IP, user agent, and user context for security analysis
+  
+  3. **Performance Monitoring Decorators** (`libs/auth/infrastructure/src/decorators/metrics.decorator.ts`)
+     - **@MeasureTime**: Method execution time measurement for any class method
+     - **@TrackDatabaseOperation**: Database query performance tracking with operation/table context
+     - **@TrackExternalService**: External API call monitoring with success/failure tracking
+     - **@InjectMetrics**: Dependency injection helper for MetricsService integration
+     - **Applied to Core Services**: Database repositories, JWT service, OAuth services with performance tracking
+  
+  4. **AlertingService** (`libs/auth/infrastructure/src/services/alerting.service.ts`)
+     - **Rule-Based Alerting**: Configurable alert rules with conditions (greater_than, less_than, equals)
+     - **Severity Levels**: Low, medium, high, critical severity classification
+     - **Default Security Rules**: Pre-configured rules for login failures, rate limits, brute force, high response times
+     - **Multiple Channels**: Console, webhook, email, Slack notification support
+     - **Alert Management**: Active alert tracking, manual resolution, auto-resolution capabilities
+     - **Real-time Monitoring**: 1-minute rule checking interval with automatic rule evaluation
+     - **Manual Triggering**: API endpoints for manual alert triggering and testing
+  
+  5. **Monitoring APIs** (`libs/auth/infrastructure/src/controllers/`)
+     - **MetricsController**: 8 endpoints for metrics access (/metrics, /metrics/auth, /metrics/performance, etc.)
+     - **AlertingController**: 7 endpoints for alert management (/alerting/rules, /alerting/alerts, etc.)
+     - **Authentication Required**: All monitoring endpoints secured with JWT authentication
+     - **Comprehensive Documentation**: Full OpenAPI/Swagger documentation with examples
+     - **Export Formats**: Metrics available in JSON and Prometheus formats
+     - **Filtering Capabilities**: Tag-based filtering and metric-specific queries
+  
+  6. **Integration Features**
+     - **Environment Configuration**: Monitoring features controllable via environment variables
+     - **Global Interceptor**: MetricsInterceptor automatically applied when metrics enabled
+     - **Repository Integration**: Database performance tracking in all TypeORM repositories
+     - **Service Integration**: OAuth services and JWT service with external call monitoring
+     - **Health Check Integration**: Metrics service health status in health endpoints
+  
+  **🔧 Key Features Implemented:**
+  - **Real-time Metrics**: Live collection of 25+ metric types with sub-second precision
+  - **Automatic Detection**: Zero-configuration authentication and security event tracking
+  - **Performance Monitoring**: Complete request lifecycle tracking with database and external service timing
+  - **Security Alerting**: Proactive threat detection with configurable rules and multi-channel notifications
+  - **Production Ready**: Configurable retention, cleanup, export formats, and monitoring integrations
+  - **Developer Friendly**: Decorator-based performance tracking and comprehensive API documentation
 
 - [ ] 14. Create documentation and deployment configuration
   - [ ] 14.1 Generate API documentation
