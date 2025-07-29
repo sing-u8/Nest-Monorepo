@@ -262,7 +262,12 @@ async function configureSwagger(app: any, config: AppConfig): Promise<void> {
     .addTag('Authentication', 'User authentication and registration')
     .addTag('Profile', 'User profile management')
     .addTag('OAuth', 'Social login with Google and Apple')
-    .addTag('Health', 'Application health checks')
+    .addTag('Health', 'Application health checks and monitoring')
+    .addTag('Metrics', 'Application metrics and performance monitoring')
+    .addTag('Alerting', 'Alert management and security notifications')
+    .setContact('API Support', 'https://yourapp.com/support', 'support@yourapp.com')
+    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
+    .setExternalDoc('API Guide', 'https://docs.yourapp.com/api')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
