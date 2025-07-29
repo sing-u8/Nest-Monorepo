@@ -1,0 +1,213 @@
+# Docker Compose configuration for production environment
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+version: '3.8'
+
+services:
+  # Production PostgreSQL with security hardening
+  postgres:
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME} 
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports: []  # No external ports in production
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./database/prod-init:/docker-entrypoint-initdb.d
+      - ./database/postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # Production Redis with persistence and security
+  redis:
+    restart: always
+    ports: []  # No external ports in production
+    volumes:
+      - redis_prod_data:/data
+      - ./redis/redis.prod.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  # Production Auth Service with security and performance optimizations
+  auth-service:
+    restart: always
+    ports: []  # Only accessible through nginx
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_NAME=${APP_NAME:-Auth Service}
+      - APP_VERSION=${APP_VERSION:-1.0.0}
+      
+      # Database configuration
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_SYNCHRONIZE=false
+      - DATABASE_LOGGING=false
+      - DATABASE_MAX_CONNECTIONS=20
+      
+      # Redis configuration
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      
+      # JWT configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRATION=15m
+      - JWT_REFRESH_TOKEN_EXPIRATION=7d
+      
+      # OAuth configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      - APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+      - APPLE_TEAM_ID=${APPLE_TEAM_ID}
+      - APPLE_KEY_ID=${APPLE_KEY_ID}
+      - APPLE_PRIVATE_KEY=${APPLE_PRIVATE_KEY}
+      - APPLE_CALLBACK_URL=${APPLE_CALLBACK_URL}
+      
+      # Security configuration
+      - SECURITY_ENABLE_RATE_LIMITING=true
+      - SECURITY_ENABLE_HELMET=true
+      - SECURITY_ENABLE_MTLS=${SECURITY_ENABLE_MTLS:-false}
+      - SECURITY_MTLS_CA_PATH=${SECURITY_MTLS_CA_PATH}
+      - SECURITY_MTLS_CERT_PATH=${SECURITY_MTLS_CERT_PATH}
+      - SECURITY_MTLS_KEY_PATH=${SECURITY_MTLS_KEY_PATH}
+      
+      # Monitoring configuration
+      - MONITORING_ENABLE_METRICS=true
+      - MONITORING_ENABLE_HEALTH_CHECK=true
+      - MONITORING_ENABLE_ALERTING=true
+      - MONITORING_WEBHOOK_URL=${MONITORING_WEBHOOK_URL}
+      - MONITORING_EMAIL_TO=${MONITORING_EMAIL_TO}
+      
+      # Logging configuration
+      - LOG_LEVEL=warn
+      - LOG_ENABLE_CONSOLE=false
+      - LOG_ENABLE_FILE=true
+      - LOG_FILE_PATH=/app/logs/auth-service.log
+      
+      # API configuration
+      - API_PREFIX=api/v1
+      - API_ENABLE_CORS=false
+      - API_CORS_ORIGIN=${API_CORS_ORIGIN}
+      
+    volumes:
+      - prod_logs:/app/logs
+      - prod_uploads:/app/uploads
+      - ./ssl:/app/ssl:ro  # SSL certificates for mTLS
+    deploy:
+      replicas: 2  # Run 2 instances for high availability
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  # Production Nginx with SSL and security headers
+  nginx:
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/prod:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - prod_nginx_logs:/var/log/nginx
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  # Log aggregation service (optional)
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.0
+    container_name: auth-filebeat
+    restart: unless-stopped
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - prod_logs:/var/log/app:ro
+      - prod_nginx_logs:/var/log/nginx:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOSTS}
+      - KIBANA_HOST=${KIBANA_HOST}
+    networks:
+      - auth-network
+    profiles:
+      - logging
+
+  # Monitoring agent (optional)
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: auth-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - auth-network
+    profiles:
+      - monitoring
+
+# Production-specific volumes with backup considerations
+volumes:
+  postgres_prod_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/docker/volumes/auth-postgres-prod
+  redis_prod_data:
+    driver: local
+    driver_opts:
+      type: none 
+      o: bind
+      device: /var/lib/docker/volumes/auth-redis-prod
+  prod_logs:
+    driver: local
+  prod_uploads:
+    driver: local
+  prod_nginx_logs:
+    driver: local

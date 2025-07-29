@@ -1,0 +1,123 @@
+# Docker Compose configuration for development environment
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # Development PostgreSQL with relaxed settings
+  postgres:
+    environment:
+      POSTGRES_DB: auth_db_dev
+      POSTGRES_USER: auth_dev
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts with local DB
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./database/dev-init:/docker-entrypoint-initdb.d
+
+  # Development Redis with no persistence
+  redis:
+    ports:
+      - "6380:6379"  # Different port for development
+    volumes:
+      - redis_dev_data:/data
+    command: redis-server --appendonly no --save ""
+
+  # Auth service in development mode
+  auth-service:
+    build:
+      target: builder  # Use builder stage for development
+    container_name: auth-service-dev
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=auth_db_dev
+      - DATABASE_USERNAME=auth_dev
+      - DATABASE_PASSWORD=dev_password
+      - DATABASE_SYNCHRONIZE=true
+      - DATABASE_LOGGING=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - LOG_LEVEL=debug
+      - API_ENABLE_CORS=true
+      - SECURITY_ENABLE_RATE_LIMITING=false
+      - MONITORING_ENABLE_METRICS=true
+      # Development JWT secrets (DO NOT use in production)
+      - JWT_SECRET=development-jwt-secret-key-32-characters-long
+      - JWT_REFRESH_SECRET=development-refresh-secret-key-32-characters-long
+    volumes:
+      - .:/app  # Mount source code for hot reloading
+      - /app/node_modules  # Prevent overriding node_modules
+      - dev_logs:/app/logs
+    command: npm run serve  # Use development server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Development tools container
+  dev-tools:
+    image: node:20-alpine
+    container_name: auth-dev-tools
+    working_dir: /app
+    volumes:
+      - .:/app
+    networks:
+      - auth-network
+    command: tail -f /dev/null  # Keep container running
+    profiles:
+      - tools  # Only start with --profile tools
+
+  # Database administration tool
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: auth-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - auth-network
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+  # Redis administration tool
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: auth-redis-commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - auth-network
+    depends_on:
+      - redis
+    profiles:
+      - tools
+
+# Development-specific volumes
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  dev_logs:
+    driver: local
+  pgadmin_data:
+    driver: local

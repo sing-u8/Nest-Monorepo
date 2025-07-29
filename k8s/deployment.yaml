@@ -1,0 +1,307 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: auth-service
+  labels:
+    app: auth-service
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        version: v1
+    spec:
+      serviceAccountName: auth-service
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: auth-service
+        image: auth-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        # Configuration from ConfigMap
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: PORT
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: APP_NAME
+        - name: APP_VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: APP_VERSION
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: API_PREFIX
+        - name: API_ENABLE_CORS
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: API_ENABLE_CORS
+        
+        # Database configuration
+        - name: DATABASE_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: DATABASE_TYPE
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: DATABASE_NAME
+        - name: DATABASE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: DATABASE_USERNAME
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: DATABASE_PASSWORD
+        
+        # Redis configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: REDIS_PORT
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: REDIS_PASSWORD
+        
+        # JWT configuration
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: JWT_SECRET
+        - name: JWT_REFRESH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: JWT_REFRESH_SECRET
+        - name: JWT_ISSUER
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: JWT_ISSUER
+        - name: JWT_AUDIENCE
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: JWT_AUDIENCE
+        
+        # OAuth configuration
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: GOOGLE_CLIENT_SECRET
+        - name: APPLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: APPLE_CLIENT_ID
+        - name: APPLE_TEAM_ID
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: APPLE_TEAM_ID
+        - name: APPLE_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: APPLE_KEY_ID
+        - name: APPLE_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: APPLE_PRIVATE_KEY
+        
+        # Security configuration
+        - name: SECURITY_ENABLE_RATE_LIMITING
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: SECURITY_ENABLE_RATE_LIMITING
+        - name: SECURITY_ENABLE_HELMET
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: SECURITY_ENABLE_HELMET
+        
+        # Monitoring configuration
+        - name: MONITORING_ENABLE_METRICS
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: MONITORING_ENABLE_METRICS
+        - name: MONITORING_ENABLE_HEALTH_CHECK
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: MONITORING_ENABLE_HEALTH_CHECK
+        - name: MONITORING_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secrets
+              key: MONITORING_WEBHOOK_URL
+        
+        # Logging configuration
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: LOG_LEVEL
+        - name: LOG_ENABLE_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: LOG_ENABLE_FILE
+        - name: LOG_FILE_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: auth-service-config
+              key: LOG_FILE_PATH
+        
+        # Resource limits
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Startup probe
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        
+        # Volume mounts
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: uploads
+          mountPath: /app/uploads
+        - name: ssl-certs
+          mountPath: /app/ssl
+          readOnly: true
+        
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+      
+      # Volumes
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: auth-service-uploads
+      - name: ssl-certs
+        secret:
+          secretName: auth-service-tls
+      
+      # Pod security
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      
+      # Restart policy
+      restartPolicy: Always
+      
+      # Node affinity (optional)
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - auth-service
+              topologyKey: kubernetes.io/hostname
