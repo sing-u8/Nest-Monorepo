@@ -38,24 +38,25 @@
   
   **📊 Test Results:** 57 test cases passed, complete test coverage for all domain entities
 
-- [ ] 3. Define use case interfaces and ports
-  - [ ] 3.1 Create repository port interfaces in domain layer
-    - Define UserRepository interface in src/domain/ports/ with CRUD operations
-    - Define TokenRepository interface in src/domain/ports/ with token management operations
-    - Define AuthSessionRepository interface in src/domain/ports/ with session operations
+- [x] 3. Define use case interfaces and ports ✅ **COMPLETED**
+  - [x] 3.1 Create repository port interfaces in domain layer ✅ **COMPLETED**
+    - ✅ Define UserRepository interface in src/domain/ports/ with CRUD operations (save, findById, findByEmail, existsByEmail, update, delete, activate/deactivate, findByProvider)
+    - ✅ Define TokenRepository interface in src/domain/ports/ with token management operations (save, findByValue, findByUserId, revoke, delete expired, count active)
+    - ✅ Define AuthSessionRepository interface in src/domain/ports/ with session operations (save, findById, findBySessionToken, revoke, update activity, cleanup)
     - _Requirements: 8.3, 8.4_
   
-  - [ ] 3.2 Create external service port interfaces in domain layer
-    - Define GoogleOAuthService interface in src/domain/ports/ for Google authentication
-    - Define AppleOAuthService interface in src/domain/ports/ for Apple authentication
-    - Define PasswordHashingService interface in src/domain/ports/ for password operations
-    - Define TokenService interface in src/domain/ports/ for JWT operations
+  - [x] 3.2 Create external service port interfaces in domain layer ✅ **COMPLETED**
+    - ✅ Define GoogleOAuthService interface in src/domain/ports/ for Google authentication (exchange code, get user info, verify ID token, refresh tokens)
+    - ✅ Define AppleOAuthService interface in src/domain/ports/ for Apple authentication (verify ID token, extract user info, validate nonce)
+    - ✅ Define PasswordHashingService interface in src/domain/ports/ for password operations (hash, compare, validate format, generate salt)
+    - ✅ Define TokenService interface in src/domain/ports/ for JWT operations (generate, verify, decode, revoke, token pairs)
     - _Requirements: 4.1, 4.2, 5.1, 5.2, 7.1_
   
-  - [ ] 3.3 Define use case input/output models in domain layer
-    - Create request/response DTOs in src/domain/models/ for all authentication use cases
-    - Define output port interfaces for presenters in src/domain/ports/
-    - Implement proper validation for input models
+  - [x] 3.3 Define use case input/output models in domain layer ✅ **COMPLETED**
+    - ✅ Create request/response DTOs in src/domain/models/ for all authentication use cases (Register, Login, SocialLogin, RefreshToken, UpdateProfile, Logout)
+    - ✅ Define output port interfaces for presenters in src/domain/ports/ (AuthPresenter, ProfilePresenter with success/error presentation methods)
+    - ✅ Implement comprehensive input/output model types with proper TypeScript typing
+    - ✅ Create index files for clean exports and organized imports
     - _Requirements: 8.4, 8.5_
 
 - [ ] 4. Implement core use cases with business logic
