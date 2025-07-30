@@ -8,6 +8,9 @@ import {
   DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { DatabaseHealthIndicator } from '../infrastructure/database/database.health';
+import { ExternalServicesHealthIndicator } from '../infrastructure/health/external-services.health';
+import { MetricsService } from '../infrastructure/monitoring/metrics.service';
+import { PerformanceService } from '../infrastructure/monitoring/performance.service';
 
 /**
  * Health Check Controller
@@ -23,6 +26,9 @@ export class HealthController {
     private readonly databaseHealthIndicator: DatabaseHealthIndicator,
     private readonly memoryHealthIndicator: MemoryHealthIndicator,
     private readonly diskHealthIndicator: DiskHealthIndicator,
+    private readonly externalServicesHealthIndicator: ExternalServicesHealthIndicator,
+    private readonly metricsService: MetricsService,
+    private readonly performanceService: PerformanceService,
   ) {}
 
   /**
@@ -224,5 +230,225 @@ export class HealthController {
         },
       })),
     ]);
+  }
+
+  /**
+   * External services health check
+   * 
+   * Checks the health of external dependencies including
+   * OAuth providers and third-party services.
+   */
+  @Get('external')
+  @ApiOperation({ 
+    summary: 'Get external services health status',
+    description: 'Returns health status for external dependencies including OAuth providers'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'External services health check passed' 
+  })
+  @ApiResponse({ 
+    status: 503, 
+    description: 'External services health check failed' 
+  })
+  @HealthCheck()
+  async checkExternal(): Promise<HealthCheckResult> {
+    return this.health.check([
+      () => this.externalServicesHealthIndicator.checkAllExternalServices('external_services'),
+    ]);
+  }
+
+  /**
+   * OAuth services health check
+   * 
+   * Specifically checks OAuth provider availability
+   * including Google and Apple authentication services.
+   */
+  @Get('oauth')
+  @ApiOperation({ 
+    summary: 'Get OAuth services health status',
+    description: 'Returns health status specifically for OAuth authentication providers'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'OAuth services health check passed' 
+  })
+  @ApiResponse({ 
+    status: 503, 
+    description: 'OAuth services health check failed' 
+  })
+  @HealthCheck()
+  async checkOAuth(): Promise<HealthCheckResult> {
+    return this.health.check([
+      () => this.externalServicesHealthIndicator.checkAllOAuthServices('oauth_services'),
+    ]);
+  }
+
+  /**
+   * Network connectivity health check
+   * 
+   * Tests basic network connectivity to external endpoints
+   * to ensure the service can reach external dependencies.
+   */
+  @Get('network')
+  @ApiOperation({ 
+    summary: 'Get network connectivity status',
+    description: 'Tests network connectivity to external endpoints'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Network connectivity check passed' 
+  })
+  @ApiResponse({ 
+    status: 503, 
+    description: 'Network connectivity check failed' 
+  })
+  @HealthCheck()
+  async checkNetwork(): Promise<HealthCheckResult> {
+    return this.health.check([
+      () => this.externalServicesHealthIndicator.checkNetworkConnectivity('network_connectivity'),
+    ]);
+  }
+
+  /**
+   * Application metrics endpoint
+   * 
+   * Returns application performance and usage metrics
+   * for monitoring and alerting systems.
+   */
+  @Get('metrics')
+  @ApiOperation({ 
+    summary: 'Get application metrics',
+    description: 'Returns comprehensive application metrics including authentication events, performance data, and system statistics'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Application metrics retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        timestamp: { type: 'string' },
+        uptime: { type: 'number' },
+        authentication: { type: 'object' },
+        oauth: { type: 'object' },
+        security: { type: 'object' },
+        system: { type: 'object' },
+        performance: { type: 'object' }
+      }
+    }
+  })
+  async getMetrics(): Promise<any> {
+    return this.metricsService.getMetricsSummary();
+  }
+
+  /**
+   * Application metrics in Prometheus format
+   * 
+   * Returns metrics in Prometheus exposition format
+   * for integration with Prometheus monitoring.
+   */
+  @Get('metrics/prometheus')
+  @ApiOperation({ 
+    summary: 'Get metrics in Prometheus format',
+    description: 'Returns application metrics in Prometheus exposition format'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Prometheus metrics retrieved successfully',
+    schema: {
+      type: 'string',
+      example: '# HELP auth_requests_total Total authentication requests\n# TYPE auth_requests_total counter\nauth_requests_total 42\n'
+    }
+  })
+  async getPrometheusMetrics(): Promise<string> {
+    return this.metricsService.getPrometheusMetrics();
+  }
+
+  /**
+   * Performance monitoring data
+   * 
+   * Returns detailed performance monitoring information
+   * including operation statistics and system health.
+   */
+  @Get('performance')
+  @ApiOperation({ 
+    summary: 'Get performance monitoring data',
+    description: 'Returns comprehensive performance monitoring data including operation statistics and system health assessment'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Performance data retrieved successfully' 
+  })
+  async getPerformance(): Promise<any> {
+    return this.performanceService.getPerformanceSummary();
+  }
+
+  /**
+   * Slow operations report
+   * 
+   * Returns a report of the slowest operations
+   * for performance optimization insights.
+   */
+  @Get('performance/slow')
+  @ApiOperation({ 
+    summary: 'Get slow operations report',
+    description: 'Returns a report of the slowest operations for performance analysis'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Slow operations report retrieved successfully' 
+  })
+  async getSlowOperations(): Promise<any> {
+    return {
+      timestamp: new Date().toISOString(),
+      slowOperations: this.performanceService.getSlowOperationsReport(20),
+    };
+  }
+
+  /**
+   * Comprehensive system status
+   * 
+   * Returns a comprehensive system status report
+   * combining health checks, metrics, and performance data.
+   */
+  @Get('status')
+  @ApiOperation({ 
+    summary: 'Get comprehensive system status',
+    description: 'Returns comprehensive system status including health checks, metrics, and performance data'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'System status retrieved successfully' 
+  })
+  async getSystemStatus(): Promise<any> {
+    const [
+      healthCheck,
+      metrics,
+      performance,
+      databaseInfo
+    ] = await Promise.allSettled([
+      this.check().catch(err => ({ status: 'error', error: err.message })),
+      this.metricsService.getMetricsSummary(),
+      this.performanceService.getPerformanceSummary(),
+      this.databaseHealthIndicator.getDatabaseInfo(),
+    ]);
+
+    return {
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: process.uptime(),
+      health: healthCheck.status === 'fulfilled' ? healthCheck.value : healthCheck.reason,
+      metrics: metrics.status === 'fulfilled' ? metrics.value : { error: metrics.reason },
+      performance: performance.status === 'fulfilled' ? performance.value : { error: performance.reason },
+      database: databaseInfo.status === 'fulfilled' ? databaseInfo.value : { error: databaseInfo.reason },
+      system: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        architecture: process.arch,
+        memoryUsage: process.memoryUsage(),
+        cpuUsage: process.cpuUsage(),
+      },
+    };
   }
 }

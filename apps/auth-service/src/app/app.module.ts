@@ -18,6 +18,9 @@ import { DatabaseModule } from '../modules/database.module';
 // Security module
 import { SecurityModule } from '../infrastructure/security/security.module';
 
+// Monitoring module
+import { MonitoringModule } from '../infrastructure/monitoring/monitoring.module';
+
 // Guards
 import { RateLimitGuard } from '../infrastructure/security/rate-limit.guard';
 
@@ -64,6 +67,9 @@ import { HealthController } from './health.controller';
 
     // Authentication module (main business logic)
     AuthModule,
+
+    // Monitoring module (health checks, metrics, alerting)
+    MonitoringModule,
   ],
   controllers: [
     AppController,

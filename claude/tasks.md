@@ -419,19 +419,26 @@
   - **Coverage**: 90%+ code coverage with comprehensive reporting and thresholds
   - **Test Categories**: Unit, Integration, E2E with separate Jest configurations and timeouts
 
-- [ ] 13. Add monitoring and health checks
-  - [ ] 13.1 Implement health check endpoints
-    - Create /health endpoint for application status
-    - Add database connectivity checks
-    - Add external service dependency checks
-    - Configure health check monitoring
+- [x] 13. Add monitoring and health checks ✅ **COMPLETED**
+  - [x] 13.1 Implement health check endpoints ✅ **COMPLETED**
+    - ✅ Create /health endpoint for application status
+    - ✅ Add database connectivity checks
+    - ✅ Add external service dependency checks (OAuth providers, network connectivity)
+    - ✅ Configure health check monitoring with @nestjs/terminus
+    - ✅ Add liveness and readiness probes for Kubernetes deployment
+    - ✅ Implement comprehensive health endpoints: memory, disk, external services, metrics
+    - ✅ Create ExternalServicesHealthIndicator for OAuth provider monitoring
     - _Requirements: 8.1_
   
-  - [ ] 13.2 Add application metrics and monitoring
-    - Implement metrics collection for authentication events
-    - Add performance monitoring for critical paths
-    - Configure logging aggregation and monitoring
-    - Set up alerting for security events
+  - [x] 13.2 Add application metrics and monitoring ✅ **COMPLETED**
+    - ✅ Implement metrics collection for authentication events (MetricsService with comprehensive tracking)
+    - ✅ Add performance monitoring for critical paths (PerformanceService with operation tracking and thresholds)
+    - ✅ Configure logging aggregation and monitoring (LoggingService with structured logging and security events)
+    - ✅ Set up alerting for security events (AlertingService with rule-based alerts and cooldown periods)
+    - ✅ Create MonitoringModule with health indicators and monitoring services
+    - ✅ Add Prometheus metrics export format for monitoring integration
+    - ✅ Implement comprehensive alerting rules for security, performance, availability, and capacity
+    - ✅ Add security event logging with audit trails and correlation IDs
     - _Requirements: 7.5_
 
 - [ ] 14. Create documentation and deployment configuration
