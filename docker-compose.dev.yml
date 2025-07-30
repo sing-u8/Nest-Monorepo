@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # Development PostgreSQL Database
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: auth-service-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth_service_dev
+      POSTGRES_USER: auth_user_dev
+      POSTGRES_PASSWORD: auth_password_dev
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data/pgdata
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user_dev -d auth_service_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - auth-dev-network
+
+  # Development Redis Cache
+  redis-dev:
+    image: redis:7.2-alpine
+    container_name: auth-service-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth-dev-network
+
+  # Development Auth Service (for testing Docker build)
+  auth-service-dev:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+      target: runtime
+    container_name: auth-service-app-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      # Database configuration
+      DB_HOST: postgres-dev
+      DB_PORT: 5432
+      DB_USERNAME: auth_user_dev
+      DB_PASSWORD: auth_password_dev
+      DB_NAME: auth_service_dev
+      DB_SSL: "false"
+      # Redis configuration
+      REDIS_HOST: redis-dev
+      REDIS_PORT: 6379
+      # JWT Configuration
+      JWT_SECRET: "dev-jwt-secret-key"
+      JWT_REFRESH_SECRET: "dev-refresh-secret-key"
+      JWT_ACCESS_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      # OAuth Configuration (development)
+      GOOGLE_CLIENT_ID: "dev-google-client-id"
+      GOOGLE_CLIENT_SECRET: "dev-google-client-secret"
+      APPLE_CLIENT_ID: "dev-apple-client-id"
+      APPLE_TEAM_ID: "dev-apple-team-id"
+      APPLE_KEY_ID: "dev-apple-key-id"
+      APPLE_PRIVATE_KEY: "dev-apple-private-key"
+      # Security Configuration
+      BCRYPT_ROUNDS: 10
+      RATE_LIMIT_TTL: 60
+      RATE_LIMIT_MAX: 1000
+      # Monitoring Configuration
+      ENABLE_STRUCTURED_LOGGING: "false"
+      ENABLE_SECURITY_LOGGING: "true"
+      LOG_LEVEL: "DEBUG"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      redis-dev:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - ./logs:/app/logs
+      # Mount source for development debugging
+      - ./apps/auth-service/src:/app/src:ro
+    networks:
+      - auth-dev-network
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  auth-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

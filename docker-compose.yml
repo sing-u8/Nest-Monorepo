@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: auth-service-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - auth-network
+
+  # Redis Cache (for rate limiting and session storage)
+  redis:
+    image: redis:7.2-alpine
+    container_name: auth-service-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth-network
+
+  # Auth Service Application
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+      target: runtime
+    container_name: auth-service-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Database configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: auth_user
+      DB_PASSWORD: auth_password
+      DB_NAME: auth_service
+      DB_SSL: "false"
+      # Redis configuration
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # JWT Configuration
+      JWT_SECRET: "your-super-secret-jwt-key-change-this-in-production"
+      JWT_REFRESH_SECRET: "your-super-secret-refresh-key-change-this-in-production"
+      JWT_ACCESS_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      # OAuth Configuration (set your own credentials)
+      GOOGLE_CLIENT_ID: "your-google-client-id"
+      GOOGLE_CLIENT_SECRET: "your-google-client-secret"
+      APPLE_CLIENT_ID: "your-apple-client-id"
+      APPLE_TEAM_ID: "your-apple-team-id"
+      APPLE_KEY_ID: "your-apple-key-id"
+      APPLE_PRIVATE_KEY: "your-apple-private-key"
+      # Security Configuration
+      BCRYPT_ROUNDS: 12
+      RATE_LIMIT_TTL: 60
+      RATE_LIMIT_MAX: 100
+      # Monitoring Configuration
+      ENABLE_STRUCTURED_LOGGING: "true"
+      ENABLE_SECURITY_LOGGING: "true"
+      LOG_LEVEL: "LOG"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - auth-network
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: auth-service-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - auth-service
+    networks:
+      - auth-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  auth-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

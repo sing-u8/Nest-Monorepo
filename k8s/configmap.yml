@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  namespace: auth-service
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  APP_NAME: "Auth Service"
+  API_PREFIX: "api"
+  
+  # Database Configuration
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "auth_service"
+  DB_SSL: "true"
+  DB_POOL_SIZE: "20"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  
+  # JWT Configuration
+  JWT_ACCESS_EXPIRES_IN: "15m"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+  JWT_ISSUER: "auth-service"
+  JWT_AUDIENCE: "auth-service-users"
+  
+  # Security Configuration
+  BCRYPT_ROUNDS: "12"
+  RATE_LIMIT_TTL: "60"
+  RATE_LIMIT_MAX: "100"
+  RATE_LIMIT_AUTH_MAX: "10"
+  
+  # Monitoring Configuration
+  ENABLE_STRUCTURED_LOGGING: "true"
+  ENABLE_SECURITY_LOGGING: "true"
+  LOG_LEVEL: "LOG"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_DATABASE_TIMEOUT: "5000"
+  HTTP_TIMEOUT: "30000"
