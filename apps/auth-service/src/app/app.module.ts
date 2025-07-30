@@ -1,29 +1,82 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { TerminusModule } from '@nestjs/terminus';
+
+// Configuration
+import { 
+  configurations, 
+  configValidationSchema 
+} from '../config/configuration';
+
+// Application modules
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from '../modules/auth.module';
 import { DatabaseModule } from '../modules/database.module';
-import { UserModule } from '../modules/user.module';
-import { authConfig, databaseConfig, oauthConfig } from '../config';
 
+// Security module
+import { SecurityModule } from '../infrastructure/security/security.module';
+
+// Guards
+import { RateLimitGuard } from '../infrastructure/security/rate-limit.guard';
+
+// Health check controller
+import { HealthController } from './health.controller';
+
+/**
+ * Application Root Module
+ * 
+ * Main module that orchestrates all application modules with proper
+ * configuration, security, and dependency injection setup.
+ */
 @Module({
   imports: [
+    // Global configuration with validation
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig, databaseConfig, oauthConfig],
-      envFilePath: ['.env', '.env.development', '.env.production'],
+      load: configurations,
+      validationSchema: configValidationSchema,
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false,
+      },
+      envFilePath: [
+        '.env.local',
+        '.env.development',
+        '.env.production',
+        '.env',
+      ],
+      expandVariables: true,
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
+
+    // Database module
     DatabaseModule,
+
+    // Security module (includes rate limiting)
+    SecurityModule,
+
+    // Health checks
+    TerminusModule.forRoot({
+      errorLogStyle: 'pretty',
+      gracefulShutdownTimeoutMs: 5000,
+    }),
+
+    // Authentication module (main business logic)
     AuthModule,
-    UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [
+    AppController,
+    HealthController,
+  ],
+  providers: [
+    AppService,
+    
+    // Global guards
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
+  ],
 })
 export class AppModule {}
