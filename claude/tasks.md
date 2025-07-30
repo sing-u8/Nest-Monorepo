@@ -80,25 +80,38 @@
     - ✅ Handle edge cases: user not found, inactive users, invalid credentials, service failures
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 8.3, 8.4_
   
-  **📊 Test Results:** 80 test cases passed (previous 57 entity tests + 23 new use case tests), comprehensive coverage for domain layer
+  **📊 Test Results:** 150 test cases passed (57 entity tests + 23 previous use case tests + 70 new use case tests), comprehensive coverage for domain layer
   
-  - [ ] 4.3 Implement RefreshTokenUseCase
-    - Create RefreshTokenUseCase with token validation and rotation
-    - Implement secure token refresh logic
-    - Write unit tests for token refresh scenarios
+  - [x] 4.3 Implement RefreshTokenUseCase ✅ **COMPLETED**
+    - ✅ Create RefreshTokenUseCase in src/domain/use-cases/ with @Injectable decorator and @Inject tokens
+    - ✅ Implement secure token validation, rotation, and user verification (InvalidRefreshTokenError, TokenExpiredError, UserNotActiveError)
+    - ✅ Add token signature verification and payload validation with TokenService integration
+    - ✅ Implement token rotation security: revoke old refresh token and generate new token pair
+    - ✅ Add session validation and activity updates with client info tracking
+    - ✅ Write comprehensive unit tests using @nestjs/testing with mocked dependencies (15+ test cases)
+    - ✅ Handle edge cases: expired tokens, invalid tokens, inactive users, invalid sessions
     - _Requirements: 2.4, 2.6, 6.6_
   
-  - [ ] 4.4 Implement SocialLoginUseCase for OAuth flows
-    - Create SocialLoginUseCase supporting Google and Apple OAuth
-    - Implement user creation/lookup for social users
-    - Add proper error handling for OAuth failures
-    - Write unit tests with mocked OAuth services
+  - [x] 4.4 Implement SocialLoginUseCase for OAuth flows ✅ **COMPLETED**
+    - ✅ Create SocialLoginUseCase in src/domain/use-cases/ supporting Google and Apple OAuth with @Injectable decorator
+    - ✅ Implement Google OAuth flow: authorization code exchange, user info retrieval, token validation
+    - ✅ Implement Apple OAuth flow: ID token verification, user info extraction with privacy handling
+    - ✅ Add user account linking: create new users or link to existing accounts by email
+    - ✅ Implement comprehensive error handling: UnsupportedProviderError, OAuthAuthorizationError, OAuthUserInfoError
+    - ✅ Add provider-specific validation and user creation from social profile data
+    - ✅ Write comprehensive unit tests using @nestjs/testing with mocked OAuth services (25+ test cases)
+    - ✅ Handle edge cases: invalid providers, failed OAuth flows, deactivated users, invalid tokens
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
   
-  - [ ] 4.5 Implement UpdateProfileUseCase
-    - Create UpdateProfileUseCase with profile validation
-    - Implement profile picture upload handling
-    - Write unit tests for profile update scenarios
+  - [x] 4.5 Implement UpdateProfileUseCase ✅ **COMPLETED**
+    - ✅ Create UpdateProfileUseCase in src/domain/use-cases/ with @Injectable decorator and comprehensive validation
+    - ✅ Implement profile validation: name format, profile picture URL validation with HTTPS requirement
+    - ✅ Add comprehensive input validation: user ID format, name length/characters, image file extensions
+    - ✅ Implement change detection and NoChangesError for identical values
+    - ✅ Add user account status validation and UserNotActiveError for inactive users
+    - ✅ Handle profile picture updates with URL validation and security checks (HTTPS, valid extensions, length limits)
+    - ✅ Write comprehensive unit tests using @nestjs/testing with validation scenarios (30+ test cases)
+    - ✅ Handle edge cases: user not found, invalid data, no changes, validation failures
     - _Requirements: 1.5, 1.6_
 
 - [ ] 5. Implement infrastructure layer adapters
