@@ -11,7 +11,8 @@
       "Bash(cd:*)",
       "Bash(cd:*)",
       "Bash(cd:*)",
-      "Bash(npx nx test:*)"
+      "Bash(npx nx test:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }
