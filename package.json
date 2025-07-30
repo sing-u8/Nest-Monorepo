@@ -10,7 +10,15 @@
     "migration:revert": "npm run typeorm -- migration:revert",
     "migration:show": "npm run typeorm -- migration:show",
     "schema:sync": "npm run typeorm -- schema:sync",
-    "schema:drop": "npm run typeorm -- schema:drop"
+    "schema:drop": "npm run typeorm -- schema:drop",
+    "test:auth": "nx test auth-service",
+    "test:auth:unit": "nx test auth-service --testNamePattern='(?<!integration|e2e)\\.spec\\.ts$'",
+    "test:auth:integration": "nx test auth-service --testNamePattern='integration\\.spec\\.ts$'",
+    "test:auth:e2e": "nx test auth-service --testNamePattern='e2e-spec\\.ts$'",
+    "test:auth:coverage": "nx test auth-service --coverage",
+    "test:auth:watch": "nx test auth-service --watch",
+    "lint:auth": "nx lint auth-service",
+    "build:auth": "nx build auth-service"
   },
   "private": true,
   "dependencies": {
