@@ -37,7 +37,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/nestjs-monorepo-e2e/**/*"]
+      "exclude": ["apps/nestjs-monorepo-e2e/**/*", "auth-service-e2e/**/*"]
     }
   ]
 }

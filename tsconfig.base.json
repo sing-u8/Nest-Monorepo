@@ -14,7 +14,13 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@auth/domain/*": ["apps/auth-service/src/domain/*"],
+      "@auth/infrastructure/*": ["apps/auth-service/src/infrastructure/*"],
+      "@auth/shared/*": ["apps/auth-service/src/shared/*"],
+      "@auth/config/*": ["apps/auth-service/src/config/*"],
+      "@auth/modules/*": ["apps/auth-service/src/modules/*"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
